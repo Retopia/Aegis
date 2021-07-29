@@ -1,7 +1,7 @@
 # Aegis
 ![Project View](https://i.imgur.com/LJ0EUYC.png)
-**This program is not responsible for any damage caused**
-**If you encrypt a file with a password, then subsequently forget the said password, the file may be unrecoverable.**
+**This program is not responsible for any damage caused**  
+**If you encrypt a file with a password, then subsequently forget the said password, the file may be unrecoverable.**  
 
 ## Why Aegis?
 * Aegis encrypts files with AES-256 bit encryption, one of the best encryption algorithm that is publicly available at this time
