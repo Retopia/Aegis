@@ -1,5 +1,3 @@
-package aegis;
-
 import java.io.File;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -36,9 +34,10 @@ public class FilePane extends Pane {
         icon.setText(icon.getText().toUpperCase());
 
         title = new Label(file.getName());
-        close = new Button("X");
-        close.setStyle("-fx-background-color: transparent");
-        close.setFont(new Font(16));
+
+        close = new Button("×");
+        close.setStyle("-fx-background-color: red; -fx-pref-height: 28px; -fx-pref-height: 28px;");
+        close.setFont(Font.font("System", FontWeight.BOLD, 30));
 
         super.getChildren().addAll(icon, title, close);
 
