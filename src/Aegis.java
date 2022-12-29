@@ -8,6 +8,11 @@ import javafx.application.Application;
 import static java.lang.Thread.sleep;
 import static javafx.application.Application.launch;
 
+import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
@@ -158,82 +163,79 @@ public class Aegis extends Application {
         stage.heightProperty().addListener(stageSizeListener);
     }
 
-    private void displayProgressDialog(boolean isEncryption, String password) {
-        Task copyWorker = processFile(password, isEncryption, System.currentTimeMillis());
-        Thread processThread = new Thread(copyWorker);
-
-        ProgressDialog progressDialog = new ProgressDialog(copyWorker);
-        progressDialog.getDialogPane().getStylesheets().clear();
-        progressDialog.getDialogPane().getStylesheets().add(this.getClass().getResource("stylesheet.css").toExternalForm());
-        progressDialog.getDialogPane().getStyleClass().add("dialog");
-
-        copyWorker.setOnSucceeded(event -> progressDialog.close());
-
-        progressDialog.setGraphic(null);
-        progressDialog.setHeaderText(null);
-        progressDialog.setContentText("Processing files...");
-
-        progressDialog.initStyle(StageStyle.DECORATED);
-        progressDialog.initOwner(stage);
-        progressDialog.initModality(Modality.WINDOW_MODAL);
-        progressDialog.setTitle("In Progress...");
-
-        // Spawns the dialog in the middle of the screen
-        final Window window = progressDialog.getDialogPane().getScene().getWindow();
-        window.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
+    private void processFile(String password, boolean isEncryption, long startTime) {
+        MultiProgressDialog dialog = new MultiProgressDialog(stage);
+        // Create the tasks
+        Task task1 = new Task() {
             @Override
-            public void handle(WindowEvent event) {
-                window.setX((dimensions.getWidth() - window.getWidth()) / 2);
-                window.setY((dimensions.getHeight() - window.getHeight()) / 2);
-            }
-        });
-
-        progressDialog.setOnCloseRequest(e ->{
-            processThread.interrupt();
-        });
-
-        // A "hack" which adds an invisible button to allow this dialog to be closed using the "x" button
-        progressDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        Node closeButton = progressDialog.getDialogPane().lookupButton(ButtonType.CLOSE);
-        closeButton.managedProperty().bind(closeButton.visibleProperty());
-        closeButton.setVisible(false);
-        processThread.start();
-        progressDialog.showAndWait();
-    }
-
-    private Task processFile(String password, boolean isEncryption, long startTime) {
-        return new Task() {
-            @Override
-            protected Object call()  {
-                try {
+            protected Object call() throws Exception {
                 String process = isEncryption ? "Encrypting " : "Decrypting ";
+
+                // Perform some task here and update the progress and message properties
                 for (int i = 0; i < files.size(); i++) {
-                        // Update message and start encryption/decryption process
-                        File original = files.get(i).getFile();
-                        File aegisFile = new File(original.getParent(), original.getName() + ".aegis");
-                        updateMessage(process + aegisFile.getName());
+                    File original = files.get(i).getFile();
+                    File aegisFile = new File(original.getParent(), original.getName() + ".aegis");
+                    updateProgress(i, files.size() - 1);
+                    updateMessage(process + original.getName());
+
+                    // Start task 2 and bind its progress to task 1's progress bar
+                    Task task2 = new Task() {
+                        @Override
+                        protected Object call() throws Exception {
+                            // Perform some task here and update the progress and message properties
+                            if (isEncryption) {
+                                while (aegisFile.length() < original.length()) {
+                                    updateProgress(aegisFile.length(), original.length());
+                                    updateMessage(aegisFile.length() + "/" + original.length() + " bytes processed");
+                                }
+
+                                updateProgress(original.length(), original.length());
+                                updateMessage(original.length() + "/" + original.length() + " bytes processed");
+                                return null;
+                            } else {
+                                while (original.length() < aegisFile.length()) {
+                                    updateProgress(original.length(), aegisFile.length());
+                                    updateMessage(original.length() + "/" + aegisFile.length() + " bytes processed");
+                                }
+
+                                updateProgress(aegisFile.length(), aegisFile.length());
+                                updateMessage(aegisFile.length() + "/" + aegisFile.length() + " bytes processed");
+                                return null;
+                            }
+                        }
+                    };
+
+                    final int counter = i;
+                    // Bind the progress and message properties of task2 to the progress bar and label in the MultiProgressDialog
+                    Platform.runLater(() -> {
                         boolean processResult = AES.processFile(original, aegisFile, password, isEncryption);
-
-                        // Update message and delete temporary Aegis file
-                        updateProgress(i, files.size() - 1);
-                        updateMessage("Secure deleting temporary file " + aegisFile.getName());
                         AES.secureDelete(original, aegisFile, processResult);
-                        files.get(i).setSuccess(processResult);
-                    }
+                        files.get(counter).setSuccess(processResult);
+                        dialog.getProgressBar2().progressProperty().bind(task2.progressProperty());
+                        dialog.getLabel2().textProperty().bind(task2.messageProperty());
+                    });
 
-                    long elapsedTime = System.currentTimeMillis() - startTime;
-
-                    // Ensures the progress bar dialog shows up for at least half a second since it seems weird if a random dialog just appeared for 0.1 seconds
-                    if (elapsedTime < 500) {
-                        updateProgress(1, 1);
-                        Thread.sleep(500L - elapsedTime);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    // Start the task2 thread and wait for it to finish before continuing the loop in task1
+                    Thread task2Thread = new Thread(task2);
+                    task2Thread.start();
+                    task2Thread.join();
                 }
-                return true;
+                return null;
             }
         };
+
+        // Bind the progress and message properties of task1 to the progress bar and label in the MultiProgressDialog
+        dialog.getLabel1().textProperty().bind(task1.messageProperty());
+        dialog.getProgressBar1().progressProperty().bind(task1.progressProperty());
+
+        // Start the task1 thread
+        Thread process = new Thread(task1);
+        process.setDaemon(true);
+        process.start();
+
+        if (!process.isAlive()) {
+            dialog.close();
+        }
     }
 
     private boolean checkDuplicates(File f) {
@@ -285,7 +287,7 @@ public class Aegis extends Application {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(password -> {
             // Show progress bar
-            displayProgressDialog(true, password);
+            processFile(password, true, System.currentTimeMillis());
         });
     }
 
@@ -315,7 +317,7 @@ public class Aegis extends Application {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(password -> {
             // Show progress bar
-            displayProgressDialog(false, password);
+            processFile(password, false, System.currentTimeMillis());
         });
     }
 

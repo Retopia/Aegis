@@ -1,81 +1,73 @@
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.concurrent.Task;
-import javafx.geometry.Insets;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.StageStyle;
 
 public class MultiProgressDialog {
-    private final Stage stage;
-    private final Task<?> task;
-    private final Label label1;
-    private final Label label2;
-    private final ProgressBar progressBar1;
-    private final ProgressBar progressBar2;
+    private Stage stage;
+    private Label label1;
+    private Label label2;
+    private ProgressBar progressBar1;
+    private ProgressBar progressBar2;
 
-    public MultiProgressDialog(Task<?> task) {
-        this.task = task;
-        this.stage = new Stage();
-        this.label1 = new Label();
-        this.label2 = new Label();
-        this.progressBar1 = new ProgressBar();
-        this.progressBar2 = new ProgressBar();
-
-        label1.textProperty().bind(task.messageProperty());
-        label2.textProperty().bind(task.messageProperty());
-        progressBar1.progressProperty().bind(task.progressProperty());
-        progressBar2.progressProperty().bind(task.progressProperty());
-
-        HBox hBox1 = new HBox(5, label1, progressBar1);
-        HBox hBox2 = new HBox(5, label2, progressBar2);
-        hBox1.setAlignment(Pos.CENTER_LEFT);
-        hBox2.setAlignment(Pos.CENTER_LEFT);
-
-        VBox vBox = new VBox(10, hBox1, hBox2);
-        vBox.setPadding(new Insets(10));
-        vBox.setAlignment(Pos.CENTER);
-
-        Scene scene = new Scene(vBox);
-        stage.setScene(scene);
+    public MultiProgressDialog(Stage owner) {
+        // Initialize the stage
+        stage = new Stage();
+        stage.initStyle(StageStyle.DECORATED);
+        stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setResizable(false);
+        stage.getIcons().add(new Image(this.getClass().getResource("tempicon.png").toExternalForm()));
+
+        // Initialize the labels and progress bars
+        label1 = new Label();
+        label2 = new Label();
+        progressBar1 = new ProgressBar();
+        progressBar2 = new ProgressBar();
+
+        // Set the indeterminate property to true for both progress bars
+        progressBar1.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        progressBar2.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+
+        // Add the labels and progress bars to a layout
+        VBox vbox1 = new VBox(5, label1, progressBar1);
+        vbox1.setAlignment(Pos.CENTER_LEFT);
+        VBox vbox2 = new VBox(5, label2, progressBar2);
+        vbox2.setAlignment(Pos.CENTER_LEFT);
+        VBox vbox = new VBox(5, vbox1, vbox2);
+
+        // Set the scene and show the stage
+        Scene scene = new Scene(vbox);
+        scene.getStylesheets().add(this.getClass().getResource("stylesheet.css").toExternalForm());
+        stage.setScene(scene);
+        stage.show();
     }
 
-    public void show() {
-        new Thread(task).start();
-        stage.showAndWait();
+    public Label getLabel1() {
+        return label1;
     }
 
-    public void setTitle(String title) {
-        stage.setTitle(title);
+    public Label getLabel2() {
+        return label2;
     }
 
-    public void initOwner(Window window) {
-        stage.initOwner(window);
+    public ProgressBar getProgressBar1() {
+        return progressBar1;
     }
 
-    public DoubleProperty progress1Property() {
-        return progressBar1.progressProperty();
+    public ProgressBar getProgressBar2() {
+        return progressBar2;
     }
 
-    public DoubleProperty progress2Property() {
-        return progressBar2.progressProperty();
-    }
-
-    public StringProperty message1Property() {
-        return label1.textProperty();
-    }
-
-    public StringProperty message2Property() {
-        return label2.textProperty();
+    public void close() {
+        // Close the stage on the JavaFX application thread
+        Platform.runLater(() -> stage.close());
     }
 }
