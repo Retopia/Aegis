@@ -182,7 +182,7 @@ public class Aegis extends Application {
         root.getChildren().addAll(doubleClickPane, menu);
 
         Scene scene = new Scene(root, dimensions.getMaxX() * 0.75, dimensions.getMaxY() * 0.75);
-        stage.setTitle("Aegis V1.1");
+        stage.setTitle("Aegis V2");
         stage.setScene(scene);
         stage.show();
 
@@ -617,7 +617,7 @@ public class Aegis extends Application {
         Alert dialog = new Alert(AlertType.INFORMATION);
         dialog.setTitle("About Aegis");
         dialog.setHeaderText("");
-        dialog.setContentText("Aegis is a file encryption program originally written by Preston Tang in July 2021.\n\nFor more information, please visit https://github.com/Retopia/Aegis");
+        dialog.setContentText("Aegis is a file encryption program originally written by Preston Tang in July 2021. This is the second version of Aegis with added functionality.\n\nFor more information, please visit https://github.com/Retopia/Aegis");
         dialog.getDialogPane().getStylesheets().add(this.getClass().getResource("stylesheet.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("dialog");
         setDialogIcon(dialog);
