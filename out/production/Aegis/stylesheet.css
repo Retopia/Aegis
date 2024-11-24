@@ -1,61 +1,240 @@
-
-/* Dark theme stylesheet, inspired by Oracle and Joffrey Bion */
+/* Base theme colors and settings */
 .root {
     -fx-base: rgb(50, 50, 50);
     -fx-background: rgb(50, 50, 50);
-
-    /* Removes focus color*/
-    -fx-focus-color: rgb(50, 50, 50);
-    -fx-faint-focus-color: rgb(50, 50, 50);
-
-    /* make controls (buttons, thumb, etc.) slightly lighter */
+    -fx-focus-color: rgb(0, 120, 215);
+    -fx-faint-focus-color: rgba(0, 120, 215, 0.2);
     -fx-color: derive(-fx-base, 10%);
-
-    /* text fields and table rows background */
-    -fx-control-inner-background: rgb(20, 20, 20);
-    /* version of -fx-control-inner-background for alternative rows */
-    -fx-control-inner-background-alt: derive(-fx-control-inner-background, 2.5%);
-
-    /* text colors depending on background's brightness */
-    -fx-light-text-color: rgb(220, 220, 220);
-    -fx-mid-text-color: rgb(100, 100, 100);
-    -fx-dark-text-color: rgb(20, 20, 20);
-
-    /* A bright blue for highlighting/accenting objects.  For example: selected
-     * text; selected items in menus, lists, trees, and tables; progress bars */
-    -fx-accent: rgb(0, 80, 100);
-
-    /* color of non-focused yet selected elements */
-    -fx-selection-bar-non-focused: rgb(50, 50, 50);
 }
 
-/* Fix derived prompt color for text fields */
+/* Table styling */
+.table-view {
+    -fx-background-color: rgb(30, 30, 30);
+    -fx-table-cell-border-color: transparent;
+    -fx-control-inner-background: rgb(30, 30, 30);
+    -fx-control-inner-background-alt: rgb(35, 35, 35);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 35px;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: rgb(60, 60, 60);
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 12pt;
+    -fx-text-fill: rgb(200, 200, 200);
+    -fx-alignment: center-left;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: rgb(0, 120, 215);
+}
+
+.table-view:focused .table-row-cell:filled:selected {
+    -fx-background-color: rgb(0, 120, 215);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgb(45, 45, 45);
+}
+
+.table-row-cell:hover:selected {
+    -fx-background-color: rgb(0, 130, 230);
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: rgb(0, 100, 180);
+}
+
+.table-row-cell {
+    -fx-background-color: rgb(30, 30, 30);
+    -fx-table-cell-border-color: transparent;
+    -fx-text-fill: rgb(200, 200, 200);
+    -fx-cell-size: 28px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgb(35, 35, 35);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgb(0, 120, 215);
+    -fx-text-fill: white;
+}
+
+.table-view .column-header.align-center {
+    -fx-alignment: CENTER;
+}
+
+.table-view .column-header.align-right {
+    -fx-alignment: CENTER-RIGHT;
+}
+
+/* Menu bar styling */
+.menu-bar {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.menu {
+    -fx-background-color: transparent;
+}
+
+.menu:hover, .menu:showing {
+    -fx-background-color: rgb(60, 60, 60);
+}
+
+.menu .label {
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.menu-item {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.menu-item:hover {
+    -fx-background-color: rgb(0, 120, 215);
+}
+
+.menu-item .label {
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.menu-item:hover .label {
+    -fx-text-fill: white;
+}
+
+/* Context menu styling */
+.context-menu {
+    -fx-background-color: rgb(40, 40, 40);
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+}
+
+/* Scroll bar styling */
+.scroll-bar {
+    -fx-background-color: rgb(30, 30, 30);
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: rgb(80, 80, 80);
+    -fx-background-radius: 2em;
+}
+
+.scroll-bar:horizontal .thumb:hover,
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgb(100, 100, 100);
+}
+
+.scroll-bar:horizontal .thumb:pressed,
+.scroll-bar:vertical .thumb:pressed {
+    -fx-background-color: rgb(120, 120, 120);
+}
+
+/* Dialog styling */
+.dialog-pane {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.dialog-pane .label {
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.dialog-pane .content {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.dialog-pane .button-bar {
+    -fx-background-color: rgb(40, 40, 40);
+}
+
+.dialog-pane .button {
+    -fx-background-color: rgb(60, 60, 60);
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: rgb(80, 80, 80);
+}
+
+/* Text input styling */
 .text-input {
-    -fx-prompt-text-fill: derive(-fx-control-inner-background, +50%);
+    -fx-background-color: rgb(60, 60, 60);
+    -fx-text-fill: rgb(200, 200, 200);
+    -fx-prompt-text-fill: rgb(120, 120, 120);
 }
 
-/* Keep prompt invisible when focused (above color fix overrides it) */
 .text-input:focused {
+    -fx-background-color: rgb(70, 70, 70);
     -fx-prompt-text-fill: transparent;
 }
 
-/* Fix scroll bar buttons arrows colors */
-.scroll-bar > .increment-button > .increment-arrow,
-.scroll-bar > .decrement-button > .decrement-arrow {
-    -fx-background-color: -fx-mark-highlight-color, rgb(220, 220, 220);
+/* Progress indicator/dialog styling */
+.progress-indicator {
+    -fx-progress-color: rgb(0, 120, 215);
 }
 
-.scroll-bar > .increment-button:hover > .increment-arrow,
-.scroll-bar > .decrement-button:hover > .decrement-arrow {
-    -fx-background-color: -fx-mark-highlight-color, rgb(240, 240, 240);
+.progress-bar {
+    -fx-background-color: rgb(30, 30, 30);
 }
 
-.scroll-bar > .increment-button:pressed > .increment-arrow,
-.scroll-bar > .decrement-button:pressed > .decrement-arrow {
-    -fx-background-color: -fx-mark-highlight-color, rgb(255, 255, 255);
+.progress-bar .bar {
+    -fx-background-color: rgb(0, 120, 215);
 }
 
-.filePane {
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+.label {
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.confirmation-dialog {
+            -fx-background-color: rgb(40, 40, 40);
+        }
+
+.confirmation-dialog .dialog-button {
     -fx-background-color: rgb(60, 60, 60);
+    -fx-text-fill: rgb(200, 200, 200);
+}
+
+.confirmation-dialog .dialog-button:hover {
+    -fx-background-color: rgb(80, 80, 80);
+}
+
+.confirmation-dialog .dialog-button:pressed {
+    -fx-background-color: rgb(100, 100, 100);
+}
+
+.separator *.line {
+    -fx-border-color: #444444;
+    -fx-border-width: 0.5px;
+}
+
+.menu-separator *.line {
+    -fx-border-style: solid;
+    -fx-border-width: 0.5px;
+    -fx-border-color: #444444;
+}
+
+.menu-item:separator {
+    -fx-padding: 3px;
+    -fx-background-color: transparent;
+}
+
+.menu-item:separator .line {
+    -fx-padding: 0;
+    -fx-background-color: #444444;
+    -fx-border-color: #444444;
+    -fx-border-width: 0.5px;
 }
